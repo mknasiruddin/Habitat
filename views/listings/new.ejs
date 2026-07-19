@@ -1,0 +1,49 @@
+<% layout("/layouts/boilerplate.ejs") -%>
+
+<body>
+    <!-- <h2>List your property here...</h2>
+    <form method="POST" action="/listing">
+        <input type="text" name="list[title]" id="" placeholder="Add title"> <br><br>
+
+        <textarea name="list[description]" id="" placeholder="Add description"></textarea> <br><br>
+
+        <input type="number" name="list[price]" id=""> <br><br>
+
+        <input type="text" name="list[location]" id=""> <br><br>
+
+        <input type="text" name="list[country]" id=""> <br><br>
+
+        <button>List it</button>
+    </form> -->
+
+    <h2 style="margin-top: 30px;">List your property here !</h2>
+    <form class="row g-3" method="POST" action="/listing">
+  <div class="col-12">
+    <label for="inputAddress" class="form-label">Title</label>
+    <input type="text" class="form-control" id="inputAddress" placeholder="enter title" name="list[title]">
+  </div>
+  <div class="col-12">
+    <label for="inputAddress2" class="form-label">Description</label>
+    <input type="text" class="form-control" id="inputAddress2" placeholder="write a description" name="list[description]">
+  </div>
+  <div class="col-12">
+    <label for="img-link" class="form-label">Image link</label>
+    <input type="url" class="form-control" id="img-link" placeholder="enter image url/link" name="list[url]">
+  </div>
+  <div class="col-md-6">
+    <label for="inputEmail4" class="form-label">Price</label>
+    <input type="number" class="form-control" id="inputEmail4" name="list[price]">
+  </div>
+  <div class="col-md-6">
+    <label for="inputPassword4" class="form-label">Country</label>
+    <input type="text" class="form-control" id="inputPassword4" name="list[country]">
+  </div>
+  <div class="col-md-12">
+    <label for="inputCity" class="form-label">Location</label>
+    <input type="text" class="form-control" id="inputCity" name="list[location]>
+  </div>
+  <div class="col-12">
+    <button type="submit" class="btn btn-primary" style="margin-top: 30px; background-color: #fe424d; border: none;">List Property</button>
+  </div>
+</form>
+</body>

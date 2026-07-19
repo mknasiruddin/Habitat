@@ -1,0 +1,54 @@
+<% layout("/layouts/boilerplate.ejs") -%>
+
+<body>
+
+
+    <!-- <h2>Edit your property here...</h2>
+    <form method="POST" action="/listing/<%= find._id %>?_method=PUT">
+        <input type="text" name="title" id="" value="<%= find.title %>"> <br><br>
+
+        <textarea name="description" id=""> <%= find.description %> </textarea> <br><br>
+
+        <input type="number" name="price" id="" value="<%= find.price %>"> <br><br>
+
+        <input type="text" name="location" id="" value="<%= find.location %>"> <br><br>
+
+        <input type="text" name="country" id="" value="<%= find.country %>"> <br><br>
+
+        <button>Edit it</button>
+    </form> -->
+
+
+
+<h2 style="margin-top: 30px;">Edit your property here !</h2>
+    <form class="row g-3" method="POST" action="/listing/<%= find._id %>?_method=PUT">
+  <div class="col-12">
+    <label for="inputAddress" class="form-label">Title</label>
+    <input type="text" class="form-control" id="inputAddress"  name="title" value="<%= find.title %>">
+  </div>
+  <div class="col-12">
+    <label for="inputAddress2" class="form-label">Description</label>
+    <input type="text" class="form-control" id="inputAddress2"  name="description" value="<%= find.description %>">
+  </div>
+  <div class="col-12">
+    <label for="img-link" class="form-label">Image link</label>
+    <input type="text" class="form-control" id="img-link" name="imgurl" value="<%= find.image.url %>">
+  </div>
+  <div class="col-md-6">
+    <label for="inputEmail4" class="form-label">Price</label>
+    <input type="number" class="form-control" id="inputEmail4" name="price" value="<%= find.price %>">
+  </div>
+  <div class="col-md-6">
+    <label for="inputPassword4" class="form-label">Country</label>
+    <input type="text" class="form-control" id="inputPassword4" name="country" value="<%= find.country %>">
+  </div>
+  <div class="col-md-12">
+    <label for="inputCity" class="form-label">Location</label>
+    <input type="text" class="form-control" id="inputCity" name="location" value="<%= find.location %>">
+  </div>
+  <div class="col-12">
+    <button type="submit" class="btn btn-primary" style="margin-top: 30px; background-color: #fe424d; border: none;">List Property</button>
+  </div>
+</form>
+
+</body>

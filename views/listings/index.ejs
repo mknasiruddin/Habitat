@@ -1,0 +1,23 @@
+<% layout("/layouts/boilerplate.ejs") -%>
+
+<body>
+    <h3 style="margin: 30px; font-weight: 600;">Welcome to air bnb</h3>
+
+    <form method="GET" action="/listing/new">
+            <button class="btn btn-primary btnclr" style="margin: 20px;">List new property</button>
+    </form>
+
+    <div class="alllist row-md-5">
+        <% for(let find of findall){ %> 
+            <div class="card column-md-4" style="width: 18rem;">
+            <img src="<%= find.image.url %>" class="card-img-top" alt="..." style="height: 18rem;">
+            <div class="card-body">
+            <h5 class="card-title"><%= find.title %></h5>
+            <p class="card-text">$<%= find.price %>/night</p>
+            <a href="/listing/<%= find._id %>" class="btn btn-primary btnclr">Get details</a>
+            </div>
+    </div>
+        <% } %>
+    </div>
+</body>
+
