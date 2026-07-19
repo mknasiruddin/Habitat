@@ -131,3 +131,11 @@ app.delete("/listing/:id", async (req, res) => {
     res.redirect("/listing");
 });
 
+app.delete("/listing/:id", async (req, res) => {
+    const { id } = req.params;
+    let del = await Listing.findByIdAndDelete(id)
+        .then((res) => { console.log(res) })
+        .catch((err) => { console.log(err) });
+    res.redirect("/listing");
+});
+
