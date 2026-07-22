@@ -17,33 +17,44 @@
     </form> -->
 
     <h2 style="margin-top: 30px;">List your property here !</h2>
-    <form class="row g-3" method="POST" action="/listing">
+    <form class="row g-3 needs-validation was-validated" method="POST" action="/listing">
   <div class="col-12">
     <label for="inputAddress" class="form-label">Title</label>
-    <input type="text" class="form-control" id="inputAddress" placeholder="enter title" name="list[title]">
+    <input type="text" class="form-control" id="inputAddress" placeholder="Eg: Standalone villa" name="list[title]" required>
+    <div class="valid-feedback">
+      Looks good!
+    </div>
+    <div class="invalid-feedback">
+      Title can't be empty !
+    </div>
   </div>
   <div class="col-12">
     <label for="inputAddress2" class="form-label">Description</label>
-    <input type="text" class="form-control" id="inputAddress2" placeholder="write a description" name="list[description]">
+    <input type="text" class="form-control" id="inputAddress2" placeholder="Eg: 3bhk 2500sqft carpet area" name="list[description]" required>
+    <div class="valid-feedback">
+      Looks good!
+    </div>
   </div>
   <div class="col-12">
     <label for="img-link" class="form-label">Image link</label>
-    <input type="url" class="form-control" id="img-link" placeholder="enter image url/link" name="list[url]">
+    <input type="url" class="form-control" id="img-link" placeholder="Enter image url/link" name="list[url]">
   </div>
   <div class="col-md-6">
     <label for="inputEmail4" class="form-label">Price</label>
-    <input type="number" class="form-control" id="inputEmail4" name="list[price]">
+    <input type="number" class="form-control" id="inputEmail4" name="list[price]" placeholder="Eg: $499" required>
   </div>
   <div class="col-md-6">
     <label for="inputPassword4" class="form-label">Country</label>
-    <input type="text" class="form-control" id="inputPassword4" name="list[country]">
+    <input type="text" class="form-control" id="inputPassword4" name="list[country]" placeholder="Eg: USA" required>
   </div>
   <div class="col-md-12">
     <label for="inputCity" class="form-label">Location</label>
-    <input type="text" class="form-control" id="inputCity" name="list[location]>
+    <input type="text" class="form-control" id="inputCity" name="list[location]" placeholder="Eg: Miami" required>
   </div>
   <div class="col-12">
     <button type="submit" class="btn btn-primary" style="margin-top: 30px; background-color: #fe424d; border: none;">List Property</button>
   </div>
 </form>
 </body>
+
+

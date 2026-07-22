@@ -5,6 +5,9 @@ const Listing = require("/home/mknasiruddin/Desktop/Coding/Sigma/10_majorProject
 const path = require("path");
 const methodOverride = require("method-override");
 const ejsmate = require("ejs-mate");
+const wrapAsync = require("/home/mknasiruddin/Desktop/Coding/Sigma/10_majorProject_01/utils/wrapAsync.js");
+const expressErrors = require("./utils/ExpressError.js");
+const ExpressError = require("../11_middlewares/ExpressError.js");
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
@@ -30,6 +33,7 @@ async function main() {
 app.listen(8080, () => {
     console.log(`server running on 8080`)
 })
+
 
 // index route
 app.get("/", (req, res) => {
@@ -69,14 +73,15 @@ app.get("/listing/:id", async (req, res) => {
     res.render("/home/mknasiruddin/Desktop/Coding/Sigma/10_majorProject_01/views/listings/show.ejs", { listing });
 });
 
-app.post("/listing", async (req, res) => {
+app.post("/listing", wrapAsync(async (req, res, next) => {
+
     const newData = req.body.list;
     console.log(newData);
 
     await Listing.insertOne({
         title: newData.title,
         description: newData.description,
-        image:{
+        image: {
             url: newData.url,
         },
         price: newData.price,
@@ -84,13 +89,13 @@ app.post("/listing", async (req, res) => {
         location: newData.location,
     }).then((res) => {
         console.log(res);
-    })
-        .catch((err) => {
-            console.log(err);
-        });
+    }).catch((err) => {
+        console.log(err);
+    });
 
     res.redirect("/listing");
-});
+
+}));
 
 app.get("/listing/:id/edit", async (req, res) => {
     const { id } = req.params;
@@ -106,11 +111,11 @@ app.put("/listing/:id", async (req, res) => {
     //     .then((res) => {console.log(res)})
     //     .catch((err) => {console.log(err)});
 
-    const { title, description, imgurl ,price, location, country } = req.body;
+    const { title, description, imgurl, price, location, country } = req.body;
     await Listing.findByIdAndUpdate(id, {
         title: title,
         description: description,
-        image: {url: imgurl},
+        image: { url: imgurl },
         price: price,
         country: country,
         location: location,
@@ -129,5 +134,17 @@ app.delete("/listing/:id", async (req, res) => {
         .then((res) => { console.log(res) })
         .catch((err) => { console.log(err) });
     res.redirect("/listing");
+});
+
+app.use((req, res, next) => {
+    // next(new ExpressError(404, "page not found !"));
+    throw new ExpressError(404, "page not found");
+});
+
+// middlewares
+app.use((err, req, res, next) => {
+    let { status = 500, message = "something broke!" } = err;
+    // res.status(status).send(message);
+    res.render("./listings/error.ejs", { message });
 });
 
