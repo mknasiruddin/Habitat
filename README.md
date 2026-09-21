@@ -1,4 +1,4 @@
-# Habitat - Airbnb Clone (MERN)
+# Habitat (FULL STACK MERN WEBAPP)
 
 A full-stack Airbnb-inspired web application built using the **MERN Stack**. Users can browse vacation rentals, create and manage property listings, upload images, and securely authenticate using modern web technologies.
 
