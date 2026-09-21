@@ -1,53 +1,612 @@
 <% layout("/layouts/boilerplate.ejs") -%>
 
-<body>
-    <!-- <h3>Listing details : </h3>
-    <ul>
-        <li><%= listing.title %></li>
-        <li><%= listing.description %></li>
-        <li><%= listing.price %></li>
-        <li><%= listing.location %></li>
-        <li><%= listing.country %></li>
-        <li><%= listing.image.url %></li>
-    </ul>
-    
-    <form method="GET" action="/listing/<%= listing._id%>/edit">
-        <button>Edit listing</button>
-    </form>
-    <br>
-    <form method ="POST" action="/listing/<%= listing._id%>?_method=DELETE">
-        <button>Delete listing</button>
-    </form> -->
-    
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <h2 class="mt-4">Listing Details...</h2>
-    <div class="card offset-1 mt-4" style="width: 40rem;">
-  <img src="<%= listing.image.url %>" class="card-img-top" alt="...">
-  <div class="card-body">
-    <h5 class="card-title"><%= listing.title %></h5>
-    <p class="card-text">
-        <%= listing.description %> <br>
-        <%= listing.price %> <br>
-        <%= listing.location %> <br>
-        <%= listing.country %>
-    </p>
+<style>
+    :root {
+        --lagoon: #0e5f68;
+        --lagoon-deep: #0a3f46;
+        --sun: #e9b44c;
+        --mist: #f2f6f6;
+        --ink: #14262b;
+        --ink-soft: #5b6e73;
+        --line: #dbe4e5;
+        --card: #ffffff;
+        --danger: #b3382c;
+        --radius-lg: 28px;
+        --radius-md: 16px;
+        --radius-sm: 10px;
+        --ease: cubic-bezier(.22, 1, .36, 1);
+    }
 
-    <div class="btnSize">
-        <form method="GET" action="/listing/<%= listing._id%>/edit">
-                <button class="btn btn-primary btnclr btn-lg">Edit listing</button>
-            </form> 
+    .listing-page {
+        font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+        color: var(--ink);
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 1.5rem 1rem 5rem;
+    }
+
+    .listing-page h1,
+    .listing-page h2,
+    .listing-page h3 {
+        font-family: "Fraunces", Georgia, serif;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+    }
+
+    /* ---------- Hero (the one orchestrated moment) ---------- */
+    .hero {
+        position: relative;
+        height: clamp(320px, 56vh, 560px);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        background: var(--lagoon-deep);
+        box-shadow: 0 30px 60px -30px rgba(10, 63, 70, .55);
+        animation: hero-open 1.1s var(--ease) both;
+    }
+
+    .hero img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transform: scale(1.12);
+        animation: hero-settle 2.2s var(--ease) .1s forwards;
+    }
+
+    .hero::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(6, 30, 34, .85) 0%, rgba(6, 30, 34, .25) 45%, rgba(6, 30, 34, 0) 70%);
+    }
+
+    .hero-text {
+        position: absolute;
+        z-index: 2;
+        left: clamp(1.25rem, 4vw, 2.75rem);
+        right: clamp(1.25rem, 4vw, 2.75rem);
+        bottom: clamp(1.25rem, 4vw, 2.5rem);
+        color: #fff;
+    }
+
+    .hero-text h1 {
+        font-size: clamp(2rem, 5.2vw, 3.6rem);
+        line-height: 1.05;
+        margin: 0 0 .75rem;
+        max-width: 18ch;
+        animation: rise .9s var(--ease) .55s both;
+    }
+
+    .hero-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .5rem;
+        animation: rise .9s var(--ease) .75s both;
+    }
+
+    .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        padding: .4rem .85rem;
+        border-radius: 999px;
+        font-size: .85rem;
+        font-weight: 500;
+        background: rgba(255, 255, 255, .16);
+        border: 1px solid rgba(255, 255, 255, .28);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        color: #fff;
+    }
+
+    .body-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 2.5rem;
+        margin-top: 2.5rem;
+        animation: fade .8s ease 1s both;
+    }
+
+    /* ---------- Details ---------- */
+    .about h2 {
+        font-size: 1.6rem;
+        margin-bottom: .75rem;
+    }
+
+    .about p {
+        color: var(--ink-soft);
+        font-size: 1.05rem;
+        line-height: 1.75;
+        max-width: 62ch;
+        white-space: pre-line;
+    }
+
+    /* ---------- Booking / action card ---------- */
+    .side-card {
+        position: sticky;
+        top: 1.5rem;
+        align-self: start;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-md);
+        padding: 1.5rem;
+        box-shadow: 0 20px 40px -28px rgba(10, 63, 70, .35);
+    }
+
+    .price {
+        font-family: "Fraunces", Georgia, serif;
+        font-size: 2.1rem;
+        font-weight: 600;
+        line-height: 1;
+    }
+
+    .price small {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        font-size: .9rem;
+        font-weight: 500;
+        color: var(--ink-soft);
+    }
+
+    .side-card .rating-line {
+        margin: .6rem 0 1.25rem;
+        color: var(--ink-soft);
+        font-size: .9rem;
+    }
+
+    .actions {
+        display: flex;
+        flex-direction: column;
+        gap: .6rem;
+    }
+
+    .actions form {
+        margin: 0;
+    }
+
+    .btn-x {
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+        border: 0;
+        border-radius: var(--radius-sm);
+        padding: .85rem 1rem;
+        font-family: inherit;
+        font-weight: 600;
+        font-size: .95rem;
+        cursor: pointer;
+        transition: transform .25s var(--ease), box-shadow .25s var(--ease), background-color .25s ease, color .25s ease;
+    }
+
+    .btn-x:active {
+        transform: scale(.98);
+    }
+
+    .btn-x:focus-visible,
+    .rating-input:focus-visible,
+    .review-form textarea:focus-visible {
+        outline: 3px solid var(--sun);
+        outline-offset: 2px;
+    }
+
+    .btn-primary-x {
+        background: var(--lagoon);
+        color: #fff;
+    }
+
+    .btn-primary-x::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, .28) 50%, transparent 70%);
+        transform: translateX(-120%);
+        transition: transform .7s var(--ease);
+    }
+
+    .btn-primary-x:hover {
+        background: var(--lagoon-deep);
+        transform: translateY(-2px);
+        box-shadow: 0 14px 24px -14px rgba(10, 63, 70, .8);
+    }
+
+    .btn-primary-x:hover::before {
+        transform: translateX(120%);
+    }
+
+    .btn-ghost-x {
+        background: transparent;
+        color: var(--danger);
+        border: 1.5px solid rgba(179, 56, 44, .35);
+    }
+
+    .btn-ghost-x:hover {
+        background: var(--danger);
+        color: #fff;
+        border-color: var(--danger);
+    }
+
+    /* ---------- Reviews ---------- */
+    .reviews {
+        margin-top: 4rem;
+        padding-top: 2.5rem;
+        border-top: 1px solid var(--line);
+        display: grid;
+        grid-template-columns: 340px minmax(0, 1fr);
+        gap: 2.5rem;
+        align-items: start;
+    }
+
+    .reviews h2 {
+        font-size: 1.6rem;
+        margin-bottom: 1rem;
+    }
+
+    .review-form {
+        background: var(--mist);
+        border-radius: var(--radius-md);
+        padding: 1.5rem;
+    }
+
+    .review-form label {
+        font-weight: 600;
+        font-size: .9rem;
+        margin-bottom: .4rem;
+        display: block;
+    }
+
+    .rating-display {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: .4rem;
+    }
+
+    .stars {
+        color: var(--sun);
+        letter-spacing: .12em;
+        font-size: 1.15rem;
+        white-space: nowrap;
+    }
+
+    .stars .off {
+        color: #cfd9da;
+    }
+
+    .stars.live span {
+        display: inline-block;
+        transition: transform .25s var(--ease), color .2s ease;
+    }
+
+    .stars.live span.pop {
+        transform: scale(1.35);
+    }
+
+    .rating-input {
+        width: 100%;
+        accent-color: var(--lagoon);
+        margin-bottom: 1.1rem;
+    }
+
+    .review-form textarea {
+        width: 100%;
+        border: 1.5px solid var(--line);
+        border-radius: var(--radius-sm);
+        padding: .8rem .9rem;
+        font-family: inherit;
+        font-size: .95rem;
+        resize: vertical;
+        background: #fff;
+        transition: border-color .2s ease, box-shadow .2s ease;
+    }
+
+    .review-form textarea:focus {
+        border-color: var(--lagoon);
+        box-shadow: 0 0 0 4px rgba(14, 95, 104, .12);
+    }
+
+    .review-form .invalid-msg {
+        display: none;
+        color: var(--danger);
+        font-size: .82rem;
+        margin-top: .35rem;
+    }
+
+    .review-form.was-validated textarea:invalid {
+        border-color: var(--danger);
+    }
+
+    .review-form.was-validated textarea:invalid + .invalid-msg {
+        display: block;
+    }
+
+    .review-form .btn-x {
+        margin-top: 1rem;
+    }
+
+    .review-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+
+    .review-card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-md);
+        padding: 1.25rem;
+        display: flex;
+        flex-direction: column;
+        gap: .75rem;
+        transition: transform .35s var(--ease), box-shadow .35s var(--ease), border-color .35s ease;
+    }
+
+    .review-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(14, 95, 104, .35);
+        box-shadow: 0 22px 34px -26px rgba(10, 63, 70, .6);
+    }
+
+    .review-head {
+        display: flex;
+        align-items: center;
+        gap: .7rem;
+    }
+
+    .avatar {
+        width: 38px;
+        height: 38px;
+        flex: none;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: var(--lagoon);
+        color: #fff;
+        font-weight: 700;
+        font-size: .85rem;
+    }
+
+    .review-head strong {
+        display: block;
+        font-size: .92rem;
+        line-height: 1.2;
+    }
+
+    .review-comment {
+        color: var(--ink-soft);
+        font-size: .95rem;
+        line-height: 1.6;
+        flex: 1;
+        margin: 0;
+    }
+
+    .review-card form {
+        margin: 0;
+    }
+
+    .review-delete {
+        background: none;
+        border: 0;
+        padding: 0;
+        font-family: inherit;
+        font-size: .82rem;
+        font-weight: 600;
+        color: var(--ink-soft);
+        cursor: pointer;
+        transition: color .2s ease;
+    }
+
+    .review-delete:hover {
+        color: var(--danger);
+    }
+
+    .review-delete:focus-visible {
+        outline: 3px solid var(--sun);
+        outline-offset: 3px;
+        border-radius: 4px;
+    }
+
+    .empty {
+        border: 1.5px dashed var(--line);
+        border-radius: var(--radius-md);
+        padding: 2.5rem 1.5rem;
+        text-align: center;
+        color: var(--ink-soft);
+    }
+
+    .empty strong {
+        display: block;
+        color: var(--ink);
+        font-size: 1.05rem;
+        margin-bottom: .25rem;
+    }
+
+    /* ---------- Motion ---------- */
+    @keyframes hero-open {
+        from { clip-path: inset(0 0 100% 0 round var(--radius-lg)); }
+        to   { clip-path: inset(0 0 0 0 round var(--radius-lg)); }
+    }
+
+    @keyframes hero-settle {
+        to { transform: scale(1); }
+    }
+
+    @keyframes rise {
+        from { opacity: 0; transform: translateY(24px); }
+        to   { opacity: 1; transform: none; }
+    }
+
+    @keyframes fade {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .listing-page *,
+        .listing-page *::before {
+            animation: none !important;
+            transition: none !important;
+        }
+
+        .hero img { transform: none; }
+    }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 900px) {
+        .body-grid,
+        .reviews {
+            grid-template-columns: 1fr;
+            gap: 1.75rem;
+        }
+
+        .side-card {
+            position: static;
+            order: -1;
+        }
+    }
+</style>
+
+<%
+    const reviews = listing.reviews || [];
+    const avg = reviews.length
+        ? (reviews.reduce((sum, r) => sum + Number(r.rating || 0), 0) / reviews.length)
+        : 0;
+    const renderStars = (n) => {
+        const full = Math.round(n);
+        return "★".repeat(full) + '<span class="off">' + "★".repeat(5 - full) + "</span>";
+    };
+%>
+
+<div class="listing-page">
+
+    <!-- Hero -->
+    <section class="hero">
+        <img src="<%= listing.image.url %>" alt="<%= listing.title %>">
+        <div class="hero-text">
+            <h1><%= listing.title %></h1>
+            <div class="hero-meta">
+                <span class="chip"><%= listing.location %>, <%= listing.country %></span>
+                <% if (reviews.length) { %>
+                    <span class="chip">★ <%= avg.toFixed(1) %> from <%= reviews.length %> <%= reviews.length === 1 ? "review" : "reviews" %></span>
+                <% } %>
+            </div>
+        </div>
+    </section>
+
+    <!-- Details + actions -->
+    <div class="body-grid">
+        <section class="about">
+            <h2>About this place</h2>
+            <p><%= listing.description %></p>
+        </section>
+
+        <aside class="side-card">
+            <div class="price">
+                &#8377;<%= Number(listing.price).toLocaleString("en-IN") %>
+                <small>/ night</small>
+            </div>
+            <div class="rating-line">
+                <% if (reviews.length) { %>
+                    <span class="stars"><%- renderStars(avg) %></span>
+                <% } else { %>
+                    No reviews yet
+                <% } %>
+            </div>
+
+            <div class="actions">
+                <form method="GET" action="/listing/<%= listing._id %>/edit">
+                    <button class="btn-x btn-primary-x">Edit listing</button>
+                </form>
+                <form method="POST" action="/listing/<%= listing._id %>?_method=DELETE"
+                      onsubmit="return confirm('Delete this listing? This cannot be undone.');">
+                    <button class="btn-x btn-ghost-x">Delete listing</button>
+                </form>
+            </div>
+        </aside>
     </div>
-    <div class="btnSize">
-        <form method ="POST" action="/listing/<%= listing._id%>?_method=DELETE">
-                <button class="btn btn-primary btnclr btn-lg">Delete listing</button>
-            </form>
-    </div> 
-            
 
-    
-  </div>
+    <!-- Reviews -->
+    <section class="reviews">
+        <div>
+            <h2>Leave a review</h2>
+            <form action="/listing/<%= listing._id %>/reviews" method="POST" class="review-form" novalidate>
+                <div class="rating-display">
+                    <label for="rating">Rating</label>
+                    <span class="stars live" id="ratingStars" aria-live="polite"></span>
+                </div>
+                <input type="range" min="1" max="5" value="3" id="rating" name="review[rating]" class="rating-input">
+
+                <label for="comment">Comment</label>
+                <textarea name="review[comment]" id="comment" rows="5" required
+                          placeholder="What did you like about your stay?"></textarea>
+                <div class="invalid-msg">Write a short comment before submitting.</div>
+
+                <button class="btn-x btn-primary-x">Submit review</button>
+            </form>
+        </div>
+
+        <div>
+            <h2>All reviews</h2>
+            <% if (reviews.length) { %>
+                <div class="review-list">
+                    <% for (const review of reviews) { %>
+                        <article class="review-card">
+                            <div class="review-head">
+                                <div class="avatar">JD</div>
+                                <div>
+                                    <strong>Jon Doe</strong>
+                                    <span class="stars"><%- renderStars(review.rating) %></span>
+                                </div>
+                            </div>
+                            <p class="review-comment"><%= review.comment %></p>
+                            <form method="POST"
+                                  action="/listing/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE"
+                                  onsubmit="return confirm('Delete this review?');">
+                                <button class="review-delete">Delete review</button>
+                            </form>
+                        </article>
+                    <% } %>
+                </div>
+            <% } else { %>
+                <div class="empty">
+                    <strong>No reviews yet</strong>
+                    Share how your stay went using the form.
+                </div>
+            <% } %>
+        </div>
+    </section>
 </div>
 
-</body>
+<script>
+    (function () {
+        const range = document.getElementById("rating");
+        const starsEl = document.getElementById("ratingStars");
+        const form = document.querySelector(".review-form");
 
+        function paint(value, animate) {
+            starsEl.innerHTML = "";
+            for (let i = 1; i <= 5; i++) {
+                const s = document.createElement("span");
+                s.textContent = "★";
+                if (i > value) s.className = "off";
+                if (animate && i === value) {
+                    s.classList.add("pop");
+                    setTimeout(() => s.classList.remove("pop"), 220);
+                }
+                starsEl.appendChild(s);
+            }
+        }
 
+        paint(Number(range.value), false);
+        range.addEventListener("input", () => paint(Number(range.value), true));
+
+        form.addEventListener("submit", function (e) {
+            if (!form.checkValidity()) {
+                e.preventDefault();
+                form.classList.add("was-validated");
+            }
+        });
+    })();
+</script>
