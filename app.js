@@ -11,6 +11,8 @@ const wrapAsync = require("/home/mknasiruddin/Desktop/Coding/Sigma/10_majorProje
 const ExpressError = require("./utils/ExpressError.js");
 // const ExpressError = require("../11_middlewares/ExpressError.js");
 const CookieParser = require("cookie-parser");
+const session = require("express-session");
+const flash = require("connect-flash");
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
@@ -34,9 +36,29 @@ async function main() {
     await mongoose.connect(mongoUrl);
 }
 
+const sessionOptions = {
+    secret: "secretcode",
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+    }
+};
+
+app.use(session(sessionOptions));
+app.use(flash());
+
 app.listen(8080, () => {
     console.log(`server running on 8080`)
 })
+
+app.use((req, res, next) => {
+    res.locals.success = req.flash("success");
+    res.locals.error = req.flash("error");
+    next();
+});
 
 // ************************SERVER SIDE REVIEWS VALIDATION********************************
 
@@ -90,11 +112,15 @@ app.get("/listing/new", (req, res) => {
 });
 
 // show particular route
-app.get("/listing/:id", async (req, res) => {
+app.get("/listing/:id", wrapAsync(async (req, res) => {
     const { id } = req.params;
     const listing = await Listing.findById(id).populate("reviews");
+    if(!listing){
+        req.flash("error", "Listing not found !");
+        res.redirect("/listing");
+    }
     res.render("./listings/show.ejs", { listing });
-});
+}));
 
 app.post("/listing", wrapAsync(async (req, res, next) => {
 
@@ -115,7 +141,7 @@ app.post("/listing", wrapAsync(async (req, res, next) => {
     }).catch((err) => {
         console.log(err);
     });
-
+    req.flash("success", "New listing created !");
     res.redirect("/listing");
 
 }));
@@ -147,6 +173,7 @@ app.put("/listing/:id", async (req, res) => {
     }).catch((err) => {
             console.log(err)
         });
+    req.flash("success", "Listing updated !");
     res.redirect(`/listing/${id}`);
 });
 
@@ -155,6 +182,7 @@ app.delete("/listing/:id", async (req, res) => {
     let del = await Listing.findByIdAndDelete(id)
         .then((res) => { console.log(res) })
         .catch((err) => { console.log(err) });
+    req.flash("success", "Listing deleted !");
     res.redirect("/listing");
 });
 
@@ -169,6 +197,7 @@ app.post("/listing/:id/reviews", validateReview, wrapAsync( async (req, res) => 
     await newReview.save();
     await listreview.save();
 
+    req.flash("success", "Review added !");
     res.redirect(`/listing/${listreview._id}`);
 }));
 
@@ -181,6 +210,7 @@ app.delete("/listing/:id/reviews/:reviewid", wrapAsync( async(req, res) => {
     await Listing.findByIdAndUpdate(id, {$pull: {reviews: reviewid}});
     await Review.findByIdAndDelete(reviewid);
 
+    req.flash("success", "Review deleted !");
     res.redirect(`/listing/${id}`);
 }))
 
