@@ -1,0 +1,31 @@
+<% layout("/layouts/boilerplate.ejs") -%>
+
+<div class="row mt-5">
+    <div class="col-6 offset-3">
+        <h3>Login on Habitat</h2>
+        <form action="/login" method="POST">
+            <div class="col-12 mt-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="username" placeholder="username" name="username" required>
+                <div class="valid-feedback">
+                Looks good!
+                </div>
+                <div class="invalid-feedback">
+                Username can't be empty !
+                </div>
+            </div>
+
+            <div class="col-12 mt-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" placeholder="password" name="password" required>
+                <div class="valid-feedback">
+                Looks good!
+                </div>
+                <div class="invalid-feedback">
+                Password can't be empty !
+                </div>
+            </div>
+            <button class="btn btn-success mt-4">Submit</button>
+        </form>
+    </div>
+</div>
