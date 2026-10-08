@@ -1,18 +1,21 @@
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
-const Listing = require("/home/mknasiruddin/Desktop/Coding/Sigma/10_majorProject_01/models/listing.js");
-const Review = require("/home/mknasiruddin/Desktop/Coding/Sigma/10_majorProject_01/models/review.js")
-const {reviewSchema} = require("/home/mknasiruddin/Desktop/Coding/Sigma/10_majorProject_01/schema.js");
+const Listing = require("./models/listing.js");
+const Review = require("./models/review.js")
+const {reviewSchema} = require("./schema.js");
 const path = require("path");
 const methodOverride = require("method-override");
 const ejsmate = require("ejs-mate");
-const wrapAsync = require("/home/mknasiruddin/Desktop/Coding/Sigma/10_majorProject_01/utils/wrapAsync.js");
+const wrapAsync = require("./utils/wrapAsync.js");
 const ExpressError = require("./utils/ExpressError.js");
 // const ExpressError = require("../11_middlewares/ExpressError.js");
 const CookieParser = require("cookie-parser");
 const session = require("express-session");
 const flash = require("connect-flash");
+const passport = require("passport");
+const localStrategy = require("passport-local");
+const User = require("./models/user.js")
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
@@ -50,6 +53,13 @@ const sessionOptions = {
 app.use(session(sessionOptions));
 app.use(flash());
 
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new localStrategy(User.authenticate()));
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
 app.listen(8080, () => {
     console.log(`server running on 8080`)
 })
@@ -73,6 +83,17 @@ const validateReview = (req, res, next) => {
 };
 
 // ***************************************************************************************
+
+// demo user PBKDF2
+app.get("/demouser", async (req, res) => {
+    let fakeUser = new User({
+        email: "fakeuser@gmail.com",
+        username: "fakeuser",
+    });
+
+    let fakeuser = await User.register(fakeUser, "helloworld");
+    res.send(fakeuser); 
+});
 
 // index route
 app.get("/", (req, res) => {
@@ -99,8 +120,35 @@ app.get("/greet", (req, res) => {
 //    res.send(`db added...`);
 // })
 
-// show all route
+// sign-up route
+app.get("/signup", (req, res) => {
+    res.render("./users/signup.ejs")
+});
 
+app.post("/signup", async (req, res) => {
+    try{
+        let {username, email, password} = req.body;
+        const newUser = new User({email, username});
+        const registerUser = await User.register(newUser, password);
+        console.log(registerUser);
+        req.flash("success", "Registration done !");
+        res.redirect("/listing");
+    } catch(e) {
+        req.flash("error", e.message)
+        res.redirect("/signup");
+    }
+});
+
+app.get("/login", (req, res) => {
+    res.render("./users/login.ejs")
+});
+
+app.post("/login", passport.authenticate("local", { failureRedirect: "/login", failureFlash: true }), async (req, res) => {
+    req.flash("success", "Welcome back !");
+    res.redirect("/listing");
+});
+
+// show all route
 app.get("/listing", async (req, res) => {
     const findall = await Listing.find({});
     res.render("./listings/index.ejs", { findall });
